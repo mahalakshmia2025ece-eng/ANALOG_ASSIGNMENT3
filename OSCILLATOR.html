@@ -1,0 +1,1773 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oscillator Learning Lab | Analog Electronics</title>
+
+<style>
+:root {
+  --navy:#10233f;
+  --blue:#1769aa;
+  --cyan:#15b8c9;
+  --bg:#f3f7fc;
+  --ink:#23344d;
+  --muted:#65758b;
+  --white:#fff;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.65;
+}
+header {
+  padding:35px 20px;
+  color:white;
+  text-align:center;
+  background:linear-gradient(120deg,#10233f,#1769aa,#15b8c9);
+}
+header h1 { margin:0; font-size:clamp(27px,4vw,42px); }
+header p { margin:8px 0 0; }
+nav {
+  display:flex;
+  flex-wrap:nowrap;
+  gap:8px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  white-space:nowrap;
+  padding:12px;
+  background:#fff;
+  position:sticky;
+  top:0;
+  z-index:10;
+  box-shadow:0 3px 12px #10233f16;
+  scrollbar-width:thin;
+  scrollbar-color:#1769aa #e5eaf1;
+  -webkit-overflow-scrolling:touch;
+}
+nav::-webkit-scrollbar { height:5px; }
+nav::-webkit-scrollbar-track { background:#e5eaf1; }
+nav::-webkit-scrollbar-thumb { background:#1769aa; border-radius:10px; }
+nav button {
+  flex-shrink:0;
+  border:0;
+  padding:11px 16px;
+  border-radius:9px;
+  color:var(--navy);
+  background:#edf3fa;
+  font-weight:bold;
+  cursor:pointer;
+}
+nav button.active, nav button:hover {
+  color:white;
+  background:var(--blue);
+}
+main { max-width:1150px; margin:auto; padding:22px; }
+.page { display:none; }
+.page.active { display:block; }
+.card {
+  background:white;
+  border-radius:15px;
+  padding:22px;
+  margin:0 0 18px;
+  box-shadow:0 5px 20px #10233f0c;
+}
+h2 { color:var(--navy); margin-top:0; }
+h3 { color:#1769aa; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:16px;
+}
+.topic {
+  border:1px solid #e0eaf5;
+  border-radius:12px;
+  padding:17px;
+  background:#fbfdff;
+}
+.tag {
+  display:inline-block;
+  background:#e3f6fa;
+  color:#075d70;
+  padding:4px 9px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+table { width:100%; border-collapse:collapse; }
+th,td {
+  border:1px solid #dce5ef;
+  padding:10px;
+  text-align:left;
+}
+th { background:#eaf2fb; }
+.formula {
+  background:#edf7ff;
+  border-left:4px solid var(--blue);
+  padding:12px 15px;
+  margin:12px 0;
+  font-family:Arial,sans-serif;
+  overflow-wrap:anywhere;
+}
+figure { margin:12px 0; }
+figure img {
+  width:100%;
+  height:auto;
+  display:block;
+  border-radius:10px;
+}
+figcaption { color:var(--muted); font-size:13px; margin-top:6px; }
+button.action, .action {
+  background:var(--blue);
+  color:white;
+  border:0;
+  padding:10px 15px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+button.secondary { background:#eaf2fb; color:var(--navy); }
+input[type="number"], select {
+  padding:10px;
+  width:100%;
+  border:1px solid #bdcbdc;
+  border-radius:7px;
+  margin:5px 0 12px;
+}
+.question {
+  padding:15px 0;
+  border-bottom:1px solid #e2e9f1;
+}
+.question label { display:block; margin:6px 0; cursor:pointer; }
+.feedback { font-weight:bold; margin-top:12px; }
+canvas {
+  width:100%;
+  height:220px;
+  background:#081729;
+  border-radius:10px;
+  display:block;
+}
+.led {
+  width:65px; height:65px;
+  border-radius:50%;
+  margin:16px auto;
+  background:#45515d;
+  border:5px solid #d4dce4;
+  transition:background .2s, box-shadow .2s;
+}
+.led.on {
+  background:#ffe45c;
+  box-shadow:0 0 28px #ffd52c;
+}
+footer {
+  text-align:center;
+  padding:25px;
+  color:var(--muted);
+}
+.small { color:var(--muted); font-size:14px; }
+@media(max-width:600px) {
+  main { padding:12px; }
+  .card { padding:16px; }
+  table { font-size:13px; }
+  th,td { padding:7px; }
+}
+.quiz-question {
+  padding: 18px;
+  margin: 18px 0;
+  border: 1px solid #d8deeb;
+  border-radius: 12px;
+}
+
+.quiz-question h3 {
+  margin-bottom: 14px;
+}
+
+.quiz-option {
+  display: block;
+  padding: 9px 12px;
+  margin: 7px 0;
+  background: #f5f7fb;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.quiz-option:hover {
+  background: #e8edff;
+}
+
+#quizResult {
+  margin-top: 22px;
+  line-height: 1.7;
+}
+</style>
+</head>
+
+<body>
+<header>
+  <h1>Oscillator Learning Lab</h1>
+  <p>Explore the Wave. Understand the Circuit. Master the Concept.</p>
+  <p>Analog Electronics · Operational Amplifiers & Transistor Circuits</p>
+</header>
+
+<nav aria-label="Learning sections">
+  <button class="active" data-page="overview">Overview</button>
+  <button data-page="circuit">Circuit Design</button>
+  <button data-page="working">Working</button>
+  <button data-page="calculations">Calculations</button>
+  <button data-page="multisim">Multisim</button>
+  <button data-page="examples">Examples</button>
+  <button data-page="viva">Viva</button>
+  <button data-page="applications">Applications</button>
+  <button data-page="quiz">Quiz</button>
+  <button data-page="revision">Revision</button>
+</nav>
+
+<main>
+<!-- 1. OVERVIEW -->
+<section id="overview" class="page active">
+  <div class="card">
+    <span class="tag">START HERE</span>
+    <h2>What is an Oscillator?</h2>
+    <p>An oscillator is an electronic circuit that generates a continuous periodic signal, such as a sine wave or square wave, without requiring a periodic input signal.</p>
+    <p>It uses a DC power supply, an amplifying element and a feedback network to sustain oscillations.</p>
+    <div class="formula">
+      <b>Barkhausen criterion (ideal steady-state condition):</b><br>
+      Loop gain magnitude |Aβ| = 1<br>
+      Total loop phase shift = 0° or an integer multiple of 360°.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Types of Oscillators</h2>
+    <div class="grid">
+      <article class="topic">
+        <h3>1. RC Oscillators</h3>
+        <p>Use resistors and capacitors to set the frequency. Commonly used at audio frequencies.</p>
+        <b>Types:</b> RC Phase Shift, Wien Bridge.
+      </article>
+      <article class="topic">
+        <h3>2. LC Oscillators</h3>
+        <p>Use inductors and capacitors as a resonant network. Commonly used for radio-frequency signals.</p>
+        <b>Types:</b> Hartley, Colpitts.
+      </article>
+      <article class="topic">
+        <h3>3. Crystal Oscillator</h3>
+        <p>Uses a piezoelectric crystal, usually quartz, to obtain highly stable oscillation frequency.</p>
+        <b>Key feature:</b> High frequency stability.
+      </article>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>RC Oscillators: Compare the Two Types</h2>
+    <div class="grid">
+      <article class="topic">
+        <h3>RC Phase Shift Oscillator</h3>
+        <p>A transistor or amplifier works with a feedback network containing three RC sections. The RC network provides phase shift; the amplifier supplies the remaining phase shift and gain.</p>
+        <div class="formula">For three identical RC sections:<br>
+          f ≈ 1 / (2πRC√6)
+        </div>
+        <p class="small">This formula assumes the standard idealized three-section network with equal R and C values.</p>
+      </article>
+      <article class="topic">
+        <h3>Wien Bridge Oscillator</h3>
+        <p>Uses a lead-lag RC bridge network. It is widely used to generate low-distortion sine waves.</p>
+        <div class="formula">For equal R and C:<br>f = 1 / (2πRC)</div>
+        <p class="small">The gain and stabilization network must also be designed for sustained oscillation.</p>
+      </article>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>LC Oscillators: Compare the Two Types</h2>
+    <div class="grid">
+      <article class="topic">
+        <h3>Hartley Oscillator</h3>
+        <p>Uses a capacitive element and an inductive network with a tapped inductor or two inductors. Feedback is obtained from the inductive divider.</p>
+        <div class="formula">f ≈ 1 / (2π√(L<sub>eq</sub>C))</div>
+        <p>For coupled inductors, the equivalent inductance depends on the connection and mutual coupling.</p>
+        <p><b>Memory trick:</b> Hartley → L for inductors.</p>
+      </article>
+      <article class="topic">
+        <h3>Colpitts Oscillator</h3>
+        <p>Uses an inductor and two capacitors forming a capacitive divider. Feedback is taken from the capacitor network.</p>
+        <div class="formula">
+          C<sub>eq</sub> = (C1 × C2) / (C1 + C2)<br>
+          f ≈ 1 / (2π√(L C<sub>eq</sub>))
+        </div>
+        <p><b>Memory trick:</b> Colpitts → capacitors are split.</p>
+      </article>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Hartley vs Colpitts</h2>
+    <table>
+      <tr><th>Feature</th><th>Hartley</th><th>Colpitts</th></tr>
+      <tr><td>Feedback divider</td><td>Inductive divider</td><td>Capacitive divider</td></tr>
+      <tr><td>Resonant components</td><td>Inductor network + capacitor</td><td>Inductor + two capacitors</td></tr>
+      <tr><td>Frequency control</td><td>Effective inductance and capacitance</td><td>Inductance and equivalent capacitance</td></tr>
+      <tr><td>Common use</td><td>RF signal generation</td><td>RF signal generation</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Crystal Oscillator</h2>
+    <p>A crystal oscillator uses the mechanical resonance of a piezoelectric crystal to control the oscillation frequency. It provides excellent frequency stability compared with many ordinary RC and LC oscillators.</p>
+    <ul>
+      <li>High frequency stability.</li>
+      <li>Used for clock and timing references.</li>
+      <li>Frequency depends on the crystal and circuit configuration.</li>
+    </ul>
+    <p class="small">The crystal frequency cannot be calculated using the simple RC or LC formulas alone; its equivalent model and specified resonant frequency are needed.</p>
+  </div>
+
+  <div class="card">
+    <h2>Overall Comparison</h2>
+    <table>
+      <tr><th>Type</th><th>Frequency-setting network</th><th>Main advantage</th><th>Typical use</th></tr>
+      <tr><td>RC Phase Shift</td><td>RC sections</td><td>Simple audio-frequency design</td><td>Audio signal generation</td></tr>
+      <tr><td>Wien Bridge</td><td>Lead-lag RC bridge</td><td>Low-distortion sine wave</td><td>Function generators</td></tr>
+      <tr><td>Hartley</td><td>Inductive divider + C</td><td>RF tuning</td><td>RF circuits</td></tr>
+      <tr><td>Colpitts</td><td>Capacitive divider + L</td><td>RF feedback network</td><td>RF circuits</td></tr>
+      <tr><td>Crystal</td><td>Piezoelectric resonator</td><td>High stability</td><td>Clocks and communication</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 2. CIRCUIT DESIGN -->
+<section id="circuit" class="page">
+  <div class="card">
+    <h2>Circuit Design</h2>
+    <p>Study each circuit separately. Each section below is reserved for the circuit image and a short description only.</p>
+  </div>
+
+  <div class="card">
+    <h3>RC Phase Shift Oscillator</h3>
+    <figure>
+      <img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\RC PHASE SHIFT.jpeg"
+          >
+      <figcaption>Original uploaded Multisim screenshot. Crop the RC Phase Shift circuit from this image for a circuit-only view.</figcaption>
+    </figure>
+    <p>Three RC sections provide feedback phase shift. The transistor amplifies the signal to sustain oscillations.</p>
+  </div>
+
+  <div class="card">
+    <h3>Wien Bridge Oscillator</h3>
+    <figure>
+      <img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\WEIN BRIDGE.jpeg">
+      <figcaption>Original uploaded screenshot. Crop the Wien Bridge circuit only for the final circuit-design presentation.</figcaption>
+    </figure>
+    <p>A lead-lag RC bridge sets the oscillation frequency, while the amplifier sustains the sine wave.</p>
+  </div>
+
+  <div class="card">
+    <h3>Hartley Oscillator</h3>
+    <figure>
+      <img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\HARTLEY.jpeg">
+      <figcaption>Original uploaded screenshot. Crop the Hartley circuit only for the final circuit-design presentation.</figcaption>
+    </figure>
+    <p>The inductive divider supplies feedback, and the LC network determines the resonant frequency.</p>
+  </div>
+
+  <div class="card">
+    <h3>Colpitts Oscillator</h3>
+    <figure>
+      <img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\COLPITT.jpeg">
+      <figcaption>Original uploaded screenshot. Crop the Colpitts circuit only for the final circuit-design presentation.</figcaption>
+    </figure>
+    <p>Two capacitors form the feedback divider, while the inductor and equivalent capacitance determine frequency.</p>
+  </div>
+
+  <div class="card">
+    <h3>Crystal Oscillator</h3>
+	<img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\CRYSTAL.jpg">
+      </div>
+</section>
+
+<!-- 3. WORKING -->
+<section id="working" class="page">
+  <div class="card">
+    <h2>Working Principle and Waveforms</h2>
+    <p>At startup, a small disturbance is amplified and fed back. If the feedback has the correct phase and sufficient loop gain, oscillations build up. Nonlinearities or an amplitude-control network eventually limit the amplitude.</p>
+  </div>
+
+  <div class="card">
+    <h3>RC Phase Shift Oscillator</h3>
+    <figure>
+      <img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\RC PHASE SHIFT.jpeg">
+
+      <figcaption>Uploaded Multisim reference. Use a cropped circuit image followed by its corresponding waveform in your final report.</figcaption>
+    </figure>
+    <ol>
+      <li>The DC supply biases the transistor in its active region.</li>
+      <li>A small signal is amplified by the transistor.</li>
+      <li>The three RC sections shift the phase of the feedback signal.</li>
+      <li>The feedback returns a suitable signal to sustain oscillation.</li>
+      <li>The oscilloscope displays the output waveform.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Wien Bridge Oscillator</h3>
+    <figure>
+     <img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\WEIN BRIDGE.jpeg">
+
+      <figcaption>Uploaded simulation reference. Match the circuit and waveform using a correctly cropped image pair.</figcaption>
+    </figure>
+    <ol>
+      <li>The amplifier provides signal gain.</li>
+      <li>The lead-lag RC network selects the oscillation frequency.</li>
+      <li>At the selected frequency, the network has approximately zero phase shift.</li>
+      <li>The amplifier gain and stabilization determine whether oscillation is sustained with a stable amplitude.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Hartley Oscillator</h3>
+    <figure>
+      <img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\HARTLEY.jpeg">
+      <figcaption>Use the Hartley circuit crop and its matching oscilloscope crop.</figcaption>
+    </figure>
+    <ol>
+      <li>The active device amplifies the signal.</li>
+      <li>The inductor network and capacitor form the resonant circuit.</li>
+      <li>The inductive divider feeds part of the signal back.</li>
+      <li>The resonant frequency depends on effective inductance and capacitance.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Colpitts Oscillator</h3>
+    <figure>
+      <img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\COLPITT.jpeg">
+      <figcaption>Use the Colpitts circuit crop and its matching waveform crop.</figcaption>
+    </figure>
+    <ol>
+      <li>The transistor provides amplification.</li>
+      <li>The inductor and two capacitors form the resonant network.</li>
+      <li>The capacitive divider returns feedback to the active device.</li>
+      <li>The LC network selects the oscillation frequency.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Crystal Oscillator</h3>
+    <p>A crystal mechanically resonates due to the piezoelectric effect. Its equivalent electrical network has a sharp resonance, helping stabilize the oscillator frequency.</p>
+    <p class="small">Add the actual crystal circuit and waveform before treating this section as a completed Multisim experiment.</p>
+  </div>
+</section>
+
+<!-- 4. CALCULATIONS -->
+<section id="calculations" class="page">
+  <div class="card">
+    <h2>Oscillator Frequency Calculator</h2>
+    <p>Enter the component values to calculate an idealized theoretical frequency. Use the correct formula for the circuit you have designed.</p>
+    <label for="type">Oscillator type</label>
+    <select id="type">
+      <option value="phase">RC Phase Shift (three equal sections)</option>
+      <option value="wien">Wien Bridge (equal R and C)</option>
+      <option value="lc">LC / Hartley / Colpitts (enter equivalent L and C)</option>
+    </select>
+
+    <div id="rcInputs">
+      <label for="r">Resistance R (ohms)</label>
+      <input id="r" type="number" value="10000" min="0.000001">
+      <label for="c">Capacitance C (farads)</label>
+      <input id="c" type="number" value="0.00000001" min="0.000000000001">
+    </div>
+
+    <div id="lcInputs" style="display:none">
+      <label for="l">Equivalent inductance L (henries)</label>
+      <input id="l" type="number" value="0.00022" min="0.000000001">
+      <label for="ce">Equivalent capacitance C (farads)</label>
+      <input id="ce" type="number" value="0.000000001" min="0.000000000001">
+    </div>
+
+    <button class="action" id="calculate">Calculate Frequency</button>
+    <div class="formula" id="result" aria-live="polite">Calculated frequency will appear here.</div>
+  </div>
+
+  <div class="card">
+    <h2>Useful Formulas</h2>
+    <div class="formula">RC Phase Shift: f ≈ 1 / (2πRC√6)</div>
+    <div class="formula">Wien Bridge (equal R and C): f = 1 / (2πRC)</div>
+    <div class="formula">LC Resonance: f = 1 / (2π√(LC))</div>
+    <div class="formula">Colpitts: C<sub>eq</sub> = C1C2 / (C1 + C2)</div>
+    <div class="formula">Time period: T = 1/f</div>
+    <p class="small">These are idealized formulas. Actual frequency can differ because of transistor capacitances, loading, component tolerances and the exact circuit topology.</p>
+  </div>
+</section>
+
+<!-- 5. MULTISIM -->
+<section id="multisim" class="page">
+  <div class="card">
+    <h2>Multisim Simulation Gallery</h2>
+    <p>From circuit to waveform — observe how feedback creates a continuous signal.</p>
+    <p><b>Caption:</b> “One DC supply. A carefully designed feedback network. A continuous oscillation.”</p>
+      </div>
+
+  <div class="card">
+    <h3>RC Phase Shift Oscillator — Simulation Reference</h3>
+    <figure><img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\RC PHASE SHIFT.jpeg">
+<img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\RC WAVE.jpeg">
+
+</figure>
+  </div>
+  <div class="card">
+    <h3>Wien Bridge Oscillator — Simulation Reference</h3>
+    <figure><img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\WEIN BRIDGE.jpeg">
+<img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\WEIN BRIDGE WAVE.jpeg">
+</figure>
+  </div>
+  <div class="card">
+    <h3>Hartley and Colpitts — Simulation References</h3>
+    <figure><img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\HARTLEY.jpeg">
+<img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\HARTEL WAVE.jpeg">
+      <img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\COLPITT.jpeg">
+<img src="C:\Users\maha\OneDrive\Desktop\AE SAT2\COLPITT WAVE.jpeg">
+
+</figure>
+  </div>
+
+  <div class="card">
+    <h2>Suggested Multisim Procedure</h2>
+    <ol>
+      <li>Place the transistor or amplifier, resistors, capacitors and inductors according to the circuit diagram.</li>
+      <li>Set component values and DC supply voltage.</li>
+      <li>Check transistor pin connections and ground connections.</li>
+      <li>Connect the oscilloscope probe to the intended output node and ground.</li>
+      <li>Run transient simulation and adjust the timebase to view several cycles.</li>
+      <li>Measure the period between matching waveform points.</li>
+      <li>Calculate frequency using f = 1/T and compare it with the theoretical value.</li>
+    </ol>
+    <p><b>Caption:</b> “Simulate. Measure. Compare. Understand.”</p>
+  </div>
+</section>
+
+<!-- 6. EXAMPLES -->
+
+<!-- 6. EXAMPLES -->
+<section id="examples" class="page">
+
+  <div class="card">
+    <span class="tag">PRACTICE LAB</span>
+    <h2>Oscillator Examples & Problem Solving</h2>
+    <p>Learn by solving numerical problems, circuit-design questions, derivations, waveform calculations and practical troubleshooting.</p>
+    <p><b>Topics:</b> RC Phase Shift · Wien Bridge · Hartley · Colpitts · Crystal ·</p>
+  </div>
+
+  <div class="card">
+    <h2>Part A — RC Phase Shift Oscillator</h2>
+
+    <details open>
+      <summary><b>Problem 1: Calculate the oscillation frequency</b></summary>
+      <p><b>Given:</b> R = 10 kΩ, C = 10 nF. Assume the standard three-section RC network with equal components.</p>
+      <p><b>Formula:</b></p>
+      <div class="formula">f = 1 / (2πRC√6)</div>
+      <p><b>Substitution:</b></p>
+      <div class="formula">
+        R = 10 × 10³ Ω<br>
+        C = 10 × 10⁻⁹ F<br>
+        f = 1 / (2π × 10⁴ × 10⁻⁸ × √6)<br>
+        <b>Answer: f ≈ 650 Hz</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 2: Calculate frequency for R = 4.7 kΩ</b></summary>
+      <p><b>Given:</b> R = 4.7 kΩ, C = 10 nF.</p>
+      <div class="formula">
+        f = 1 / (2πRC√6)<br>
+        = 1 / (2π × 4700 × 10 × 10⁻⁹ × √6)<br>
+        <b>Answer: f ≈ 1.38 kHz</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 3: Find the capacitance for 1 kHz</b></summary>
+      <p><b>Given:</b> f = 1 kHz, R = 10 kΩ.</p>
+      <div class="formula">
+        f = 1 / (2πRC√6)<br>
+        C = 1 / (2πRf√6)<br>
+        C = 1 / (2π × 10,000 × 1000 × √6)<br>
+        <b>Answer: C ≈ 6.50 nF</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 4: Find R for 500 Hz</b></summary>
+      <p><b>Given:</b> f = 500 Hz, C = 10 nF.</p>
+      <div class="formula">
+        R = 1 / (2πfC√6)<br>
+        = 1 / (2π × 500 × 10 × 10⁻⁹ × √6)<br>
+        <b>Answer: R ≈ 13.0 kΩ</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 5: Determine the time period</b></summary>
+      <p><b>Given:</b> f = 650 Hz.</p>
+      <div class="formula">
+        T = 1/f<br>
+        T = 1/650 seconds<br>
+        <b>Answer: T ≈ 1.538 ms</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 6: Explain the phase shift</b></summary>
+      <p><b>Question:</b> Explain how the RC network and amplifier provide the required phase shift.</p>
+      <p><b>Answer:</b> In the standard three-section RC phase-shift oscillator, the RC network contributes approximately 180° of phase shift at the oscillation frequency. The inverting amplifier contributes another 180°. The total loop phase shift is therefore approximately 360°, allowing positive feedback.</p>
+    </details>
+
+    <details>
+      <summary><b>Problem 7: Calculate amplifier gain requirement</b></summary>
+      <p><b>Question:</b> What is the commonly quoted minimum amplifier gain magnitude for a standard three-section RC phase-shift oscillator?</p>
+      <div class="formula">
+        <b>Answer: Approximately 29.</b>
+      </div>
+      <p class="small">This is an idealized result for the standard equal-section network. Practical gain requirements depend on the actual circuit and loading.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Part B — Wien Bridge Oscillator</h2>
+
+    <details>
+      <summary><b>Problem 8: Calculate frequency</b></summary>
+      <p><b>Given:</b> R = 10 kΩ, C = 10 nF, with equal frequency-setting resistors and capacitors.</p>
+      <div class="formula">
+        f = 1 / (2πRC)<br>
+        = 1 / (2π × 10,000 × 10 × 10⁻⁹)<br>
+        <b>Answer: f ≈ 1.59 kHz</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 9: Design for 2 kHz</b></summary>
+      <p><b>Given:</b> f = 2 kHz, C = 10 nF.</p>
+      <div class="formula">
+        R = 1 / (2πfC)<br>
+        = 1 / (2π × 2000 × 10 × 10⁻⁹)<br>
+        <b>Answer: R ≈ 7.96 kΩ</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 10: Find frequency when R doubles</b></summary>
+      <p><b>Question:</b> If both equal frequency-setting resistors are doubled while capacitance remains constant, what happens to the ideal oscillation frequency?</p>
+      <div class="formula">
+        f = 1 / (2πRC)<br>
+        If R₂ = 2R₁, then f₂ = f₁/2.<br>
+        <b>Answer: Frequency becomes half.</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 11: Find the ideal amplifier gain</b></summary>
+      <p><b>Question:</b> At the balance frequency of an ideal equal-component Wien Bridge network, the feedback attenuation is 1/3. Find the ideal amplifier gain for sustained oscillation.</p>
+      <div class="formula">
+        Aβ = 1<br>
+        A × (1/3) = 1<br>
+        <b>Answer: A = 3</b>
+      </div>
+      <p>Practical circuits require an amplitude-control method to maintain stable oscillations.</p>
+    </details>
+
+    <details>
+      <summary><b>Problem 12: Calculate the time period</b></summary>
+      <p><b>Given:</b> f = 1.59 kHz.</p>
+      <div class="formula">
+        T = 1/f = 1/1590 seconds<br>
+        <b>Answer: T ≈ 0.629 ms</b>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Part C — Hartley Oscillator</h2>
+
+    <details>
+      <summary><b>Problem 13: Calculate resonant frequency</b></summary>
+      <p><b>Given:</b> L = 220 µH, C = 1 nF. Assume L is the equivalent inductance.</p>
+      <div class="formula">
+        f = 1 / (2π√LC)<br>
+        = 1 / (2π√(220 × 10⁻⁶ × 10⁻⁹))<br>
+        <b>Answer: f ≈ 339 kHz</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 14: Find equivalent inductance</b></summary>
+      <p><b>Given:</b> L₁ = 100 µH and L₂ = 150 µH. Assume two uncoupled inductors connected in series.</p>
+      <div class="formula">
+        L = L₁ + L₂<br>
+        L = 100 + 150<br>
+        <b>Answer: L = 250 µH</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 15: Find the frequency using equivalent inductance</b></summary>
+      <p><b>Given:</b> L = 250 µH, C = 1 nF.</p>
+      <div class="formula">
+        f = 1 / (2π√LC)<br>
+        = 1 / (2π√(250 × 10⁻⁶ × 10⁻⁹))<br>
+        <b>Answer: f ≈ 318.3 kHz</b>
+      </div>
+      <p class="small">In a real Hartley circuit, mutual coupling and winding polarity may change the equivalent inductance.</p>
+    </details>
+
+    <details>
+      <summary><b>Problem 16: Explain Hartley feedback</b></summary>
+      <p><b>Question:</b> Why is a tapped inductor or inductive divider used in a Hartley oscillator?</p>
+      <p><b>Answer:</b> It provides a fraction of the resonant-circuit signal as feedback. The active device supplies gain to compensate for circuit losses.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Part D — Colpitts Oscillator</h2>
+
+    <details>
+      <summary><b>Problem 17: Calculate equivalent capacitance</b></summary>
+      <p><b>Given:</b> C₁ = 10 nF, C₂ = 10 nF.</p>
+      <div class="formula">
+        Cₑq = C₁C₂ / (C₁ + C₂)<br>
+        = (10 × 10) / (10 + 10) nF<br>
+        <b>Answer: Cₑq = 5 nF</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 18: Calculate Colpitts frequency</b></summary>
+      <p><b>Given:</b> L = 100 µH, C₁ = 10 nF, C₂ = 10 nF.</p>
+      <div class="formula">
+        Cₑq = 5 nF<br>
+        f = 1 / (2π√LCₑq)<br>
+        = 1 / (2π√(100 × 10⁻⁶ × 5 × 10⁻⁹))<br>
+        <b>Answer: f ≈ 225.1 kHz</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 19: Unequal capacitors</b></summary>
+      <p><b>Given:</b> C₁ = 6 nF, C₂ = 3 nF and L = 100 µH.</p>
+      <div class="formula">
+        Cₑq = (6 × 3)/(6 + 3) nF = 2 nF<br>
+        f = 1 / (2π√(100 × 10⁻⁶ × 2 × 10⁻⁹))<br>
+        <b>Answer: f ≈ 356.8 kHz</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 20: Explain the Colpitts feedback network</b></summary>
+      <p><b>Question:</b> Why are two capacitors used in a Colpitts oscillator?</p>
+      <p><b>Answer:</b> They form a capacitive voltage divider that provides feedback. Their series-equivalent capacitance, together with the inductor, determines the ideal resonant frequency.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Part E — Crystal Oscillator</h2>
+
+    <details>
+      <summary><b>Problem 21: Frequency and time period</b></summary>
+      <p><b>Given:</b> A crystal oscillator is specified to operate at 16 MHz. Find the period.</p>
+      <div class="formula">
+        T = 1/f<br>
+        = 1/(16 × 10⁶)<br>
+        <b>Answer: T = 62.5 ns</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 22: Compare frequency stability</b></summary>
+      <p><b>Question:</b> Why is a crystal oscillator generally preferred over a simple RC oscillator for a stable digital clock?</p>
+      <p><b>Answer:</b> A quartz crystal has a sharp mechanical resonance, giving a stable reference frequency. An RC oscillator is generally more sensitive to component tolerances and environmental changes.</p>
+    </details>
+
+    <details>
+      <summary><b>Problem 23: Crystal oscillator applications</b></summary>
+      <p><b>Question:</b> Explain three applications of crystal oscillators.</p>
+      <p><b>Answer:</b> Digital clocks, microcontroller timing references and communication equipment that requires a stable frequency reference.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Part F — Oscilloscope & Multisim Problems</h2>
+
+    <details>
+      <summary><b>Problem 24: Find frequency from divisions</b></summary>
+      <p><b>Given:</b> Timebase = 0.5 ms/div. One cycle occupies 4 divisions.</p>
+      <div class="formula">
+        T = 4 × 0.5 ms = 2 ms<br>
+        f = 1/T = 1/0.002<br>
+        <b>Answer: f = 500 Hz</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 25: Calculate peak-to-peak voltage</b></summary>
+      <p><b>Given:</b> Vertical scale = 2 V/div. Waveform height = 4 divisions.</p>
+      <div class="formula">
+        Vpp = vertical divisions × volts/div<br>
+        = 4 × 2<br>
+        <b>Answer: Vpp = 8 V</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 26: Calculate percentage error</b></summary>
+      <p><b>Given:</b> Theoretical frequency = 10 kHz, measured frequency = 9.4 kHz.</p>
+      <div class="formula">
+        Error (%) = |Theoretical − Measured| / Theoretical × 100<br>
+        = |10 − 9.4| / 10 × 100<br>
+        <b>Answer: 6%</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 27: Troubleshoot a missing waveform</b></summary>
+      <p><b>Question:</b> A Multisim oscillator has a DC supply but no output waveform. List six checks.</p>
+      <ol>
+        <li>Verify transistor pin connections and bias.</li>
+        <li>Check ground and supply connections.</li>
+        <li>Check feedback-network wiring.</li>
+        <li>Confirm component values and units.</li>
+        <li>Check loop phase and startup gain.</li>
+        <li>Verify the oscilloscope probe, timebase and transient simulation settings.</li>
+      </ol>
+    </details>
+
+    <details>
+      <summary><b>Problem 28: Explain the Barkhausen criterion</b></summary>
+      <p><b>Question:</b> State the criterion and distinguish startup from steady-state oscillation.</p>
+      <p><b>Answer:</b> Ideal sustained oscillation requires loop-gain magnitude |Aβ| = 1 and total loop phase 0° or 360°. Startup usually requires loop gain slightly above unity; circuit nonlinearities or amplitude control limit the final amplitude.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Part G — Comparison & Circuit Analysis</h2>
+
+    <details>
+      <summary><b>Problem 29: Compare RC Phase Shift and Wien Bridge</b></summary>
+      <p><b>Answer:</b> Both use RC networks. A standard RC phase-shift oscillator uses three RC sections and an inverting amplifier; a Wien Bridge uses a lead-lag network and is commonly used for low-distortion sine-wave generation.</p>
+    </details>
+
+    <details>
+      <summary><b>Problem 30: Compare Hartley and Colpitts</b></summary>
+      <p><b>Answer:</b> Hartley obtains feedback through an inductive divider. Colpitts obtains feedback through a capacitive divider. Both use an LC resonant network, but the feedback components differ.</p>
+    </details>
+
+    <details>
+      <summary><b>Problem 31: Explain why oscillation frequency changes</b></summary>
+      <p><b>Question:</b> A resonant LC oscillator has unchanged inductance but increased capacitance. Explain the frequency change.</p>
+      <div class="formula">
+        f = 1 / (2π√LC)<br>
+        If C increases, √LC increases.<br>
+        <b>Therefore, frequency decreases.</b>
+      </div>
+    </details>
+
+    <details>
+      <summary><b>Problem 32: Explain feedback and energy losses</b></summary>
+      <p><b>Question:</b> Why is an active device required in a practical oscillator?</p>
+      <p><b>Answer:</b> Energy is lost in resistive elements and the resonant network. The active device supplies energy from the DC power source to compensate for these losses and sustain oscillations.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Self-Test: Check Your Understanding</h2>
+    <p>Select an answer for each question, then submit to view your score and explanations.</p>
+    <form id="oscillatorExamplesQuiz">
+      <div id="oscillatorExampleQuestions"></div>
+      <button class="action" type="submit">Check Answers</button>
+      <button class="action secondary" type="button" id="resetOscillatorExamples">Reset</button>
+    </form>
+    <p id="oscillatorExamplesScore" class="feedback" aria-live="polite"></p>
+  </div>
+
+</section>
+
+<script>
+(function () {
+  const questions = [
+    {
+      q: "Which feedback divider is used in a Hartley oscillator?",
+      options: ["Inductive divider", "Capacitive divider", "Crystal only", "No feedback"],
+      answer: 0,
+      explanation: "Hartley uses an inductive divider."
+    },
+    {
+      q: "Which feedback divider is used in a Colpitts oscillator?",
+      options: ["Inductive divider", "Capacitive divider", "Resistor only", "No feedback"],
+      answer: 1,
+      explanation: "Colpitts uses two capacitors as a capacitive divider."
+    },
+    {
+      q: "What is the ideal frequency formula for an equal-component Wien Bridge oscillator?",
+      options: ["1/(2πRC)", "1/(RC√L)", "2πRC", "1/(2π√LC)"],
+      answer: 0,
+      explanation: "For equal frequency-setting R and C values, f = 1/(2πRC)."
+    },
+    {
+      q: "What is the main reason to use a crystal oscillator for a clock reference?",
+      options: ["High frequency stability", "No power supply needed", "It only generates square waves", "It has no resonant frequency"],
+      answer: 0,
+      explanation: "Crystal resonance provides a stable frequency reference."
+    },
+    {
+      q: "An oscilloscope shows a 2 ms period. What is the frequency?",
+      options: ["50 Hz", "500 Hz", "2 kHz", "20 kHz"],
+      answer: 1,
+      explanation: "f = 1/T = 1/0.002 = 500 Hz."
+    },
+    {
+      q: "For a fixed inductance, what happens to ideal LC resonant frequency when capacitance increases?",
+      options: ["It increases", "It decreases", "It never changes", "It becomes zero immediately"],
+      answer: 1,
+      explanation: "f is inversely proportional to √C."
+    },
+    {
+      q: "Which oscillator is commonly used to generate a low-distortion sine wave?",
+      options: ["Wien Bridge", "Hartley only", "Crystal only", "None"],
+      answer: 0,
+      explanation: "Wien Bridge oscillators are commonly used for low-distortion sine-wave generation."
+    },
+    {
+      q: "For ideal sustained oscillation, what is the loop-gain magnitude?",
+      options: ["0", "0.5", "1", "100"],
+      answer: 2,
+      explanation: "The Barkhausen criterion requires |Aβ| = 1 at steady state."
+    },
+    {
+      q: "What is the Colpitts equivalent capacitance for C1 = C2 = 10 nF?",
+      options: ["20 nF", "10 nF", "5 nF", "2 nF"],
+      answer: 2,
+      explanation: "Ceq = C1C2/(C1+C2) = 100/20 = 5 nF."
+    },
+    {
+      q: "Why might a Multisim oscillator fail to start?",
+      options: ["Incorrect feedback wiring", "Correct supply voltage alone guarantees oscillation", "The circuit contains a resistor", "A waveform has a period"],
+      answer: 0,
+      explanation: "Incorrect feedback wiring is one possible cause; bias, gain and simulation settings must also be checked."
+    }
+  ];
+
+  const container = document.getElementById("oscillatorExampleQuestions");
+  const form = document.getElementById("oscillatorExamplesQuiz");
+  const score = document.getElementById("oscillatorExamplesScore");
+
+  if (!container || !form || !score) return;
+
+  function render() {
+    container.innerHTML = "";
+    questions.forEach((item, i) => {
+      const block = document.createElement("div");
+      block.className = "question";
+
+      const title = document.createElement("b");
+      title.textContent = (i + 1) + ". " + item.q;
+      block.appendChild(title);
+
+      item.options.forEach((option, j) => {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "oscillatorExample" + i;
+        input.value = j;
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(" " + option));
+        block.appendChild(label);
+      });
+
+      container.appendChild(block);
+    });
+  }
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    let correct = 0;
+    let answered = 0;
+
+    questions.forEach((item, i) => {
+      const selected = form.querySelector(
+        'input[name="oscillatorExample' + i + '"]:checked'
+      );
+      if (selected) {
+        answered++;
+        if (Number(selected.value) === item.answer) correct++;
+      }
+    });
+
+    score.textContent =
+      "Score: " + correct + "/" + questions.length +
+      " | Answered: " + answered + "/" + questions.length +
+      ". Review the solved examples above to strengthen your understanding.";
+  });
+
+  document.getElementById("resetOscillatorExamples").addEventListener("click", function () {
+    render();
+    score.textContent = "";
+  });
+
+  render();
+})();
+</script>
+
+<!-- 7. VIVA -->
+<section id="viva" class="page">
+  <div class="card">
+    <h2>Viva Questions and Answers</h2>
+    <details><summary>1. What is an oscillator?</summary><p>A circuit that generates a periodic signal without requiring a periodic input signal.</p></details>
+    <details><summary>2. Why is feedback required?</summary><p>Positive feedback returns part of the output to sustain oscillation.</p></details>
+    <details><summary>3. What is the Barkhausen criterion?</summary><p>For ideal sustained oscillation, loop-gain magnitude is one and total loop phase is 0° or 360°.</p></details>
+    <details><summary>4. What components are used in an RC oscillator?</summary><p>Resistors and capacitors set the feedback frequency.</p></details>
+    <details><summary>5. What is the main feature of a Wien Bridge oscillator?</summary><p>It can generate a low-distortion sine wave.</p></details>
+    <details><summary>6. What is the phase-shift network made of?</summary><p>Typically three RC sections in the standard RC phase-shift oscillator.</p></details>
+    <details><summary>7. What is the main difference between Hartley and Colpitts?</summary><p>Hartley uses an inductive divider; Colpitts uses a capacitive divider.</p></details>
+    <details><summary>8. How many capacitors form the Colpitts divider?</summary><p>Two capacitors.</p></details>
+    <details><summary>9. What sets the frequency of an LC oscillator?</summary><p>The effective inductance and capacitance of its resonant network.</p></details>
+    <details><summary>10. Why is a crystal oscillator stable?</summary><p>The crystal's sharp mechanical resonance provides a stable frequency reference.</p></details>
+    <details><summary>11. What does an oscilloscope display?</summary><p>Voltage variation with time, allowing waveform and period measurements.</p></details>
+    <details><summary>12. How can frequency be measured from a waveform?</summary><p>Measure the period T and calculate f = 1/T.</p></details>
+    <details><summary>13. What is the unit of frequency?</summary><p>Hertz (Hz).</p></details>
+    <details><summary>14. What is the unit of inductance?</summary><p>Henry (H).</p></details>
+    <details><summary>15. Give two applications of crystal oscillators.</summary><p>Digital clock timing and communication equipment.</p></details>
+  </div>
+</section>
+
+
+<!-- OSCILLATOR APPLICATIONS -->
+<section id="applications" class="page">
+<div class="card">
+    <h2>Real-World Applications</h2>
+    <p>Oscillators provide the signals used in timing, communication, audio testing and radio-frequency circuits.</p>
+    <div class="grid">
+      <article class="topic">
+        <h3>Digital Clocks</h3>
+        <p>Crystal oscillators provide a stable time reference.</p>
+        <p class="small">Typical oscillator: Crystal</p>
+      </article>
+      <article class="topic">
+        <h3>Radio Communication</h3>
+        <p>RF oscillators generate carrier or local-oscillator signals.</p>
+        <p class="small">Typical oscillators: Hartley, Colpitts and other LC designs</p>
+      </article>
+      <article class="topic">
+        <h3>Audio Testing</h3>
+        <p>Sine-wave generators help test amplifiers and audio circuits.</p>
+        <p class="small">Typical oscillator: Wien Bridge</p>
+      </article>
+      <article class="topic">
+        <h3>Signal and Pulse Generation</h3>
+        <p>Oscillators provide periodic signals for timing and test systems.</p>
+        <p class="small">Type depends on required waveform and frequency</p>
+      </article>
+    </div>
+  </div>
+
+
+  <div class="card">
+    <h2>Real-Time Applications of Oscillators</h2>
+    <p>Click each button to experience a simple interactive demonstration.</p>
+  </div>
+
+  <div class="application-grid">
+
+    <!-- CRYSTAL OSCILLATOR -->
+    <div class="card app-card">
+      <div class="app-icon">⌚</div>
+      <h3>Crystal Oscillator — Digital Watch</h3>
+      <p>A crystal oscillator provides a stable timing reference for digital watches and clocks.</p>
+
+      <div class="demo-screen">
+        <div class="clock-label">DIGITAL WATCH</div>
+        <div id="watchTime" class="digital-time">00:00:00</div>
+        <div id="watchStatus">Demo stopped</div>
+      </div>
+
+      <button type="button" class="action" id="watchButton"
+        onclick="toggleWatch()">▶ Start Watch</button>
+    </div>
+
+    <!-- HARTLEY OSCILLATOR -->
+    <div class="card app-card">
+      <div class="app-icon">📻</div>
+      <h3>Hartley Oscillator — Radio Transmitter</h3>
+      <p>An LC oscillator can generate a radio-frequency carrier in transmitter circuits.</p>
+
+      <div class="demo-screen">
+        <div class="clock-label">RF CARRIER SIMULATION</div>
+        <canvas id="radioWave" width="320" height="100"></canvas>
+        <div id="radioStatus">Transmitter OFF</div>
+        <div class="signal-meter">
+          <div id="radioMeter"></div>
+        </div>
+      </div>
+
+      <button type="button" class="action" id="radioButton"
+        onclick="toggleRadio()">▶ Start Transmitter</button>
+    </div>
+
+    <!-- WIEN BRIDGE OSCILLATOR -->
+    <div class="card app-card">
+      <div class="app-icon">🎵</div>
+      <h3>Wien Bridge Oscillator — Audio Signal Generator</h3>
+      <p>A Wien Bridge oscillator is commonly used to generate low-distortion audio-frequency sine waves.</p>
+
+      <div class="demo-screen">
+        <div class="clock-label">AUDIO TONE GENERATOR</div>
+        <canvas id="audioWave" width="320" height="100"></canvas>
+        <div id="audioStatus">Audio OFF</div>
+        <label for="audioFrequency">Frequency: <span id="freqValue">440</span> Hz</label>
+        <input type="range" id="audioFrequency" min="200" max="1000"
+          value="440" step="10" oninput="changeAudioFrequency(this.value)">
+      </div>
+
+      <button type="button" class="action" id="audioButton"
+        onclick="toggleAudio()">▶ Play Tone</button>
+    </div>
+
+  </div>
+</section>
+
+<style>
+.application-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+.app-card { text-align: center; }
+.app-icon { font-size: 44px; margin-bottom: 8px; }
+.demo-screen {
+  background: #101b2b;
+  color: #5df7c1;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  min-height: 150px;
+  box-sizing: border-box;
+}
+.clock-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  color: #b5c5da;
+}
+.digital-time {
+  font-family: monospace;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: bold;
+  margin: 12px 0;
+}
+.demo-screen canvas {
+  display: block;
+  width: 100%;
+  height: 100px;
+}
+.demo-screen input[type="range"] { width: 100%; margin-top: 10px; }
+.signal-meter {
+  background: #344154;
+  height: 8px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+#radioMeter {
+  width: 0%;
+  height: 100%;
+  background: #5df7c1;
+  transition: width .2s;
+}
+</style>
+
+<script>
+(function () {
+  let watchTimer = null;
+  let watchSeconds = 0;
+  let radioRunning = false;
+  let radioAnimation = null;
+  let audioContext = null;
+  let audioOscillator = null;
+  let audioGain = null;
+  let audioRunning = false;
+  let phase = 0;
+
+  const watchTime = document.getElementById("watchTime");
+  const watchStatus = document.getElementById("watchStatus");
+  const watchButton = document.getElementById("watchButton");
+
+  function formatTime(total) {
+    const h = String(Math.floor(total / 3600) % 24).padStart(2, "0");
+    const m = String(Math.floor(total / 60) % 60).padStart(2, "0");
+    const s = String(total % 60).padStart(2, "0");
+    return h + ":" + m + ":" + s;
+  }
+
+  window.toggleWatch = function () {
+    if (watchTimer) {
+      clearInterval(watchTimer);
+      watchTimer = null;
+      watchButton.textContent = "▶ Resume Watch";
+      watchStatus.textContent = "Watch paused";
+    } else {
+      watchTime.textContent = formatTime(watchSeconds);
+      watchTimer = setInterval(function () {
+        watchSeconds++;
+        watchTime.textContent = formatTime(watchSeconds);
+      }, 1000);
+      watchButton.textContent = "⏸ Pause Watch";
+      watchStatus.textContent = "Crystal timing concept demo";
+    }
+  };
+
+  const radioCanvas = document.getElementById("radioWave");
+  const radioCtx = radioCanvas.getContext("2d");
+  const radioStatus = document.getElementById("radioStatus");
+  const radioButton = document.getElementById("radioButton");
+  const radioMeter = document.getElementById("radioMeter");
+
+  function drawRadioWave() {
+    const w = radioCanvas.width;
+    const h = radioCanvas.height;
+    radioCtx.clearRect(0, 0, w, h);
+    radioCtx.strokeStyle = "#35485b";
+    radioCtx.beginPath();
+    radioCtx.moveTo(0, h / 2);
+    radioCtx.lineTo(w, h / 2);
+    radioCtx.stroke();
+
+    if (radioRunning) {
+      radioCtx.strokeStyle = "#5df7c1";
+      radioCtx.lineWidth = 2;
+      radioCtx.beginPath();
+      for (let x = 0; x < w; x++) {
+        const y = h / 2 + Math.sin(x * 0.19 + phase) * 28;
+        if (x === 0) radioCtx.moveTo(x, y);
+        else radioCtx.lineTo(x, y);
+      }
+      radioCtx.stroke();
+      phase += 0.08;
+      radioAnimation = requestAnimationFrame(drawRadioWave);
+    } else {
+      radioCtx.fillStyle = "#b5c5da";
+      radioCtx.font = "12px sans-serif";
+      radioCtx.fillText("Carrier stopped", 105, h / 2 - 8);
+    }
+  }
+
+  window.toggleRadio = function () {
+    radioRunning = !radioRunning;
+
+    if (radioRunning) {
+      radioButton.textContent = "■ Stop Transmitter";
+      radioStatus.textContent = "Carrier active — illustrative RF demo";
+      radioMeter.style.width = "85%";
+      drawRadioWave();
+    } else {
+      cancelAnimationFrame(radioAnimation);
+      radioButton.textContent = "▶ Start Transmitter";
+      radioStatus.textContent = "Transmitter OFF";
+      radioMeter.style.width = "0%";
+      drawRadioWave();
+    }
+  };
+
+  const audioCanvas = document.getElementById("audioWave");
+  const audioCtx2d = audioCanvas.getContext("2d");
+  const audioStatus = document.getElementById("audioStatus");
+  const audioButton = document.getElementById("audioButton");
+  const frequencyInput = document.getElementById("audioFrequency");
+  const freqValue = document.getElementById("freqValue");
+
+  function drawAudioWave() {
+    const w = audioCanvas.width;
+    const h = audioCanvas.height;
+    audioCtx2d.clearRect(0, 0, w, h);
+    audioCtx2d.strokeStyle = "#35485b";
+    audioCtx2d.beginPath();
+    audioCtx2d.moveTo(0, h / 2);
+    audioCtx2d.lineTo(w, h / 2);
+    audioCtx2d.stroke();
+
+    audioCtx2d.strokeStyle = "#ffce69";
+    audioCtx2d.lineWidth = 2;
+    audioCtx2d.beginPath();
+    for (let x = 0; x < w; x++) {
+      const y = h / 2 + Math.sin(x * Number(frequencyInput.value) / 220) * 28;
+      if (x === 0) audioCtx2d.moveTo(x, y);
+      else audioCtx2d.lineTo(x, y);
+    }
+    audioCtx2d.stroke();
+  }
+
+  window.changeAudioFrequency = function (value) {
+    freqValue.textContent = value;
+    if (audioOscillator && audioContext) {
+      audioOscillator.frequency.setTargetAtTime(
+        Number(value), audioContext.currentTime, 0.02
+      );
+    }
+    drawAudioWave();
+  };
+
+  window.toggleAudio = async function () {
+    if (audioRunning) {
+      if (audioGain && audioContext) {
+        audioGain.gain.setTargetAtTime(0, audioContext.currentTime, 0.03);
+      }
+      audioRunning = false;
+      audioButton.textContent = "▶ Play Tone";
+      audioStatus.textContent = "Audio OFF";
+      return;
+    }
+
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        audioStatus.textContent = "This browser does not support Web Audio.";
+        return;
+      }
+
+      if (!audioContext) audioContext = new AudioContextClass();
+      await audioContext.resume();
+
+      audioOscillator = audioContext.createOscillator();
+      audioGain = audioContext.createGain();
+
+      audioOscillator.type = "sine";
+      audioOscillator.frequency.value = Number(frequencyInput.value);
+      audioGain.gain.value = 0;
+
+      audioOscillator.connect(audioGain);
+      audioGain.connect(audioContext.destination);
+
+      audioOscillator.start();
+      audioGain.gain.setTargetAtTime(0.08, audioContext.currentTime, 0.04);
+
+      audioRunning = true;
+      audioButton.textContent = "■ Stop Tone";
+      audioStatus.textContent = "Playing " + frequencyInput.value + " Hz sine tone";
+    } catch (error) {
+      audioStatus.textContent = "Audio could not start. Check browser sound permissions.";
+    }
+  };
+
+  drawRadioWave();
+  drawAudioWave();
+})();
+</script>
+<!-- 9. QUIZ -->
+<section id="quiz" class="page">
+  <div class="card">
+    <span class="tag">TEST YOUR KNOWLEDGE</span>
+    <h2>Oscillator Quiz</h2>
+    <p>Answer all 15 questions, then select <b>Submit Quiz</b> to see your score and the correct answers.</p>
+    <form id="quizForm">
+      <div id="questions"></div>
+      <button class="action" type="submit">Submit Quiz</button>
+      <button class="action secondary" type="button" id="resetQuiz">Reset Quiz</button>
+    </form>
+    <div id="quizResult" aria-live="polite"></div>
+  </div>
+</section>
+
+<script>
+const quizQuestions = [
+  {
+    question: "1. What is the main function of an oscillator?",
+    options: [
+      "To amplify DC signals only",
+      "To generate periodic signals without an external input signal",
+      "To convert AC into DC",
+      "To store electrical energy permanently"
+    ],
+    answer: 1
+  },
+  {
+    question: "2. Which condition is required for sustained oscillations?",
+    options: [
+      "Barkhausen criterion",
+      "Ohm's law",
+      "Kirchhoff's current law only",
+      "Faraday's law only"
+    ],
+    answer: 0
+  },
+  {
+    question: "3. Which oscillator is commonly used in digital watches?",
+    options: [
+      "Hartley oscillator",
+      "Wien Bridge oscillator",
+      "Crystal oscillator",
+      "RC phase-shift oscillator"
+    ],
+    answer: 2
+  },
+  {
+    question: "4. Which components determine the frequency of an RC phase-shift oscillator?",
+    options: [
+      "Resistors and capacitors",
+      "Inductors only",
+      "Transformers only",
+      "Diodes only"
+    ],
+    answer: 0
+  },
+  {
+    question: "5. Which oscillator is commonly used for audio-frequency signal generation?",
+    options: [
+      "Crystal oscillator only",
+      "Wien Bridge oscillator",
+      "Hartley oscillator only",
+      "Colpitts oscillator only"
+    ],
+    answer: 1
+  },
+  {
+    question: "6. Which components form the frequency-determining network of a Hartley oscillator?",
+    options: [
+      "Two capacitors and one resistor",
+      "Two inductors or a tapped inductor and a capacitor",
+      "Three resistors only",
+      "A crystal and a diode"
+    ],
+    answer: 1
+  },
+  {
+    question: "7. Which components form the frequency-determining network of a Colpitts oscillator?",
+    options: [
+      "Two capacitors and an inductor",
+      "Two inductors and a resistor only",
+      "Three resistors",
+      "One resistor and one diode only"
+    ],
+    answer: 0
+  },
+  {
+    question: "8. What is the resonant-frequency formula for an ideal LC oscillator?",
+    options: [
+      "f = 2π√(LC)",
+      "f = 1/(2π√(LC))",
+      "f = R/C",
+      "f = 1/(RC)"
+    ],
+    answer: 1
+  },
+  {
+    question: "9. What is the ideal frequency formula for a Wien Bridge oscillator when R1 = R2 = R and C1 = C2 = C?",
+    options: [
+      "f = 1/(2πRC)",
+      "f = 1/(RC√6)",
+      "f = R/C",
+      "f = 2πRC"
+    ],
+    answer: 0
+  },
+  {
+    question: "10. What is the approximate amplifier gain required for a standard three-section RC phase-shift oscillator with equal sections?",
+    options: [
+      "1",
+      "3",
+      "29",
+      "1000"
+    ],
+    answer: 2
+  },
+  {
+    question: "11. What is the main advantage of a crystal oscillator?",
+    options: [
+      "Very poor frequency stability",
+      "High frequency stability",
+      "It does not require a power supply",
+      "It generates only DC"
+    ],
+    answer: 1
+  },
+  {
+    question: "12. In the Barkhausen criterion, what should the total phase shift around the loop be?",
+    options: [
+      "90°",
+      "180°",
+      "0° or 360° (an integer multiple of 360°)",
+      "45°"
+    ],
+    answer: 2
+  },
+  {
+    question: "13. If an oscillator generates a frequency of 1 kHz, what is its time period?",
+    options: [
+      "1 ms",
+      "10 ms",
+      "100 ms",
+      "1 second"
+    ],
+    answer: 0
+  },
+  {
+    question: "14. Which oscillator is suitable for generating radio-frequency signals?",
+    options: [
+      "Hartley oscillator",
+      "Wien Bridge oscillator only",
+      "RC phase-shift oscillator only",
+      "None of these"
+    ],
+    answer: 0
+  },
+  {
+    question: "15. What happens if the feedback signal does not satisfy the required phase condition?",
+    options: [
+      "Sustained oscillations may not occur",
+      "The frequency always becomes zero",
+      "The circuit always produces DC",
+      "The output is always amplified infinitely"
+    ],
+    answer: 0
+  }
+];
+
+const questionsContainer = document.getElementById("questions");
+const quizForm = document.getElementById("quizForm");
+const quizResult = document.getElementById("quizResult");
+
+function loadQuiz() {
+  questionsContainer.innerHTML = "";
+
+  quizQuestions.forEach((q, index) => {
+    const questionBox = document.createElement("div");
+    questionBox.className = "quiz-question";
+
+    const heading = document.createElement("h3");
+    heading.textContent = q.question;
+    questionBox.appendChild(heading);
+
+    q.options.forEach((option, optionIndex) => {
+      const label = document.createElement("label");
+      label.className = "quiz-option";
+
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = "question" + index;
+      radio.value = optionIndex;
+      radio.required = true;
+
+      label.appendChild(radio);
+      label.appendChild(document.createTextNode(" " + option));
+      questionBox.appendChild(label);
+    });
+
+    questionsContainer.appendChild(questionBox);
+  });
+
+  quizResult.textContent = "";
+}
+
+quizForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  let score = 0;
+  let reviewHTML = "<h3>Answer Review</h3>";
+
+  quizQuestions.forEach((q, index) => {
+    const selected = quizForm.querySelector(
+      'input[name="question' + index + '"]:checked'
+    );
+
+    if (!selected) return;
+    const selectedAnswer = Number(selected.value);
+    const correct = selectedAnswer === q.answer;
+
+    if (correct) score++;
+
+    reviewHTML += `
+      <p>
+        <strong>Question ${index + 1}:</strong>
+        ${correct ? "✅ Correct" : "❌ Incorrect"}<br>
+        <strong>Correct answer:</strong>
+        ${q.options[q.answer]}
+      </p>
+    `;
+  });
+
+  const percentage = Math.round(
+    (score / quizQuestions.length) * 100
+  );
+
+  quizResult.innerHTML = `
+    <h2>Your Score: ${score}/${quizQuestions.length}</h2>
+    <p>Percentage: ${percentage}%</p>
+    <p>${
+      percentage >= 80
+        ? "Excellent! You understand oscillator concepts well."
+        : percentage >= 50
+        ? "Good effort! Revise the concepts and try again."
+        : "Keep practising! Review the formulas and oscillator types."
+    }</p>
+    ${reviewHTML}
+  `;
+
+  quizResult.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+});
+
+document.getElementById("resetQuiz").addEventListener("click", function() {
+  quizForm.reset();
+  loadQuiz();
+});
+
+loadQuiz();
+</script>
+<!-- 10. REVISION -->
+<section id="revision" class="page">
+  <div class="card">
+    <h2>Quick Revision</h2>
+    <h3>Remember the Types</h3>
+    <ul>
+      <li><b>RC Phase Shift:</b> three RC sections in the standard circuit.</li>
+      <li><b>Wien Bridge:</b> lead-lag RC network; low-distortion sine wave.</li>
+      <li><b>Hartley:</b> feedback from an inductive divider.</li>
+      <li><b>Colpitts:</b> feedback from a capacitive divider; two capacitors.</li>
+      <li><b>Crystal:</b> stable frequency reference using crystal resonance.</li>
+    </ul>
+    <h3>Formula Memory Tricks</h3>
+    <div class="formula">RC: f is inversely proportional to RC.</div>
+    <div class="formula">LC: f is inversely proportional to √(LC).</div>
+    <div class="formula">Measured waveform: frequency = 1 / time period.</div>
+    <h3>Common Viva Traps</h3>
+    <ul>
+      <li>Hartley and Colpitts are both LC oscillators, but their feedback dividers differ.</li>
+      <li>The ideal frequency formula is an estimate; the practical result may differ.</li>
+      <li>A waveform displayed by the browser demo is not proof that a Multisim circuit works.</li>
+      <li>For a crystal oscillator, use the specified crystal frequency and circuit design.</li>
+    </ul>
+    <h3>Before Your Lab Assessment</h3>
+    <ul>
+      <li>Identify each circuit component.</li>
+      <li>Explain the feedback path.</li>
+      <li>Calculate theoretical frequency.</li>
+      <li>Measure the simulated period.</li>
+      <li>Compare theoretical and measured frequency.</li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<footer>
+  Oscillator Learning Lab · Analog Electronics · Learn, Simulate, Revise
+</footer>
+
+<script>
+// Tab navigation
+document.querySelectorAll("nav button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    button.classList.add("active");
+    document.getElementById(button.dataset.page).classList.add("active");
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+});
+
+// Frequency calculator
+const typeSelect = document.getElementById("type");
+const rcInputs = document.getElementById("rcInputs");
+const lcInputs = document.getElementById("lcInputs");
+typeSelect.addEventListener("change", () => {
+  const lc = typeSelect.value === "lc";
+  rcInputs.style.display = lc ? "none" : "block";
+  lcInputs.style.display = lc ? "block" : "none";
+});
+document.getElementById("calculate").addEventListener("click", () => {
+  let f;
+  if (typeSelect.value === "lc") {
+    const L = Number(document.getElementById("l").value);
+    const C = Number(document.getElementById("ce").value);
+    if (L <= 0 || C <= 0) {
+      document.getElementById("result").textContent = "Enter positive L and C values.";
+      return;
+    }
+    f = 1 / (2 * Math.PI * Math.sqrt(L*C));
+  } else {
+    const R = Number(document.getElementById("r").value);
+    const C = Number(document.getElementById("c").value);
+    if (R <= 0 || C <= 0) {
+      document.getElementById("result").textContent = "Enter positive R and C values.";
+      return;
+    }
+    f = typeSelect.value === "phase"
+      ? 1 / (2 * Math.PI * R * C * Math.sqrt(6))
+      : 1 / (2 * Math.PI * R * C);
+  }
+  const T = 1/f;
+  document.getElementById("result").innerHTML =
+    "<b>Theoretical frequency:</b> " + f.toLocaleString(undefined,{maximumSignificantDigits:6}) +
+    " Hz<br><b>Frequency:</b> " + (f/1000).toLocaleString(undefined,{maximumSignificantDigits:5}) +
+    " kHz<br><b>Time period:</b> " + (T*1000).toLocaleString(undefined,{maximumSignificantDigits:5}) + " ms";
+});
+
+// LED demonstration
+let ledTimer = null;
+const led = document.getElementById("led");
+const ledStatus = document.getElementById("ledStatus");
+document.getElementById("startLed").addEventListener("click", () => {
+  if (ledTimer) return;
+  ledTimer = setInterval(() => {
+    led.classList.toggle("on");
+    ledStatus.textContent = led.classList.contains("on") ? "LED is ON" : "LED is OFF";
+  }, 500);
+});
+document.getElementById("stopLed").addEventListener("click", () => {
+  clearInterval(ledTimer);
+  ledTimer = null;
+  led.classList.remove("on");
+  ledStatus.textContent = "LED is OFF";
+});
+
+// Animated illustrative sine waveform
+const canvas = document.getElementById("wave");
+const ctx = canvas.getContext("2d");
+let waveTimer = null;
+let phase = 0;
+function drawWave() {
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle = "#30465e";
+  ctx.lineWidth = 1;
+  for (let x=0; x<w; x+=50) {
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+  }
+  for (let y=0; y<h; y+=30) {
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  }
+  ctx.strokeStyle = "#f6cf55";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let x=0; x<w; x++) {
+    const y = h/2 - 55*Math.sin(x*2*Math.PI/150 + phase);
+    if (x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+drawWave();
+document.getElementById("startWave").addEventListener("click", () => {
+  if (waveTimer) return;
+  document.getElementById("waveStatus").textContent = "Illustrative waveform running.";
+  waveTimer = setInterval(() => { phase += 0.12; drawWave(); }, 30);
+});
+document.getElementById("stopWave").addEventListener("click", () => {
+  clearInterval(waveTimer);
+  waveTimer = null;
+  document.getElementById("waveStatus").textContent = "Waveform stopped.";
+});
+
+</script>
+</body>
+</html>
